@@ -1,0 +1,34 @@
+def Grade(sentence):
+    tokens = W2V.tokenize(sentence)
+    
+    embedding = Convert2Vec('./Word2Vec/Word2vec.model', tokens)
+    zero_pad = W2V.Zero_padding(embedding, Batch_size, Maxseq_length, Vector_size)
+    global sess
+    result =  sess.run(tf.argmax(prediction,1), feed_dict = {X: zero_pad , seq_len: [len(tokens)] } ) 
+    print(result) # 0 또는 1
+    if(result == 1):
+        print("긍정 입니다")
+        return 1
+    else:
+        print("부정 입니다")
+        return 0
+
+f1 = open("C:\\Users\\Playdata\\speech\\output.csv", 'r', encoding='utf-8')
+rdr = csv.reader(f1)
+STTfile = []
+for line in rdr:
+    # 종결어미로 문장을 나눌 수 있어야 해서 국어사전 비교해서 한다.
+    STTfile.append(line[0])
+f1.close()
+print(STTfile)
+
+now = datetime.datetime.now()
+nowDatetime = now.strftime('%Y%m%d')
+f = open('{}.csv'.format(nowDatetime), 'w', encoding='utf-8', newline='')  # sentimental_analysis에 생김
+# while(1):
+    #s = input("문장을 입력하세요 : ")
+for s in STTfile:
+    count = Grade(s)
+    wr = csv.writer(f)
+    wr.writerow([s, count])
+f.close() 
